@@ -1,0 +1,104 @@
+npm init
+--> enter necessary details
+npm i express mongoose
+create 'index.js'
+	
+Steps for any backend creation:
+
+//1. Importing the express
+const express = require('express');
+
+//2. Initialization 
+const app = new express();
+
+//Required - Middleware
+app.use(express.urlencoded({extended:true}));
+app.use(express.json());
+
+
+//3. API creation - app.get(url,callback)
+app.get('/',(req,res)=>{
+    res.send("Hello Server")
+})
+
+
+//API creation to post data
+app.post('/addbooks',async(req,res)=>{
+    console.log(req.body)
+    var data = await libModel(req.body);
+    data.save();
+    res.send({status:"Data saved"})
+})
+
+//API creation to view data
+app.get('/viewbooks',async(req,res)=>{
+    console.log("View")
+    var data = await libModel.find();
+    res.json(data);
+})
+
+//API creation to delete data
+app.delete('/deletebooks/:id',async(req,res)=>{
+    console.log(req.params)
+    let id = req.params.id;
+    await libModel.findByIdAndDelete(id);
+    res.json({status:"Item deleted"})
+})
+
+//API to update data
+app.put('/edit/:id',async(req,res)=>{
+    let id = req.params.id;
+    // we can also use 'try-catch method'
+    try{
+        await libModel.findByIdAndUpdate(id, req.body)
+        res.json({status:"Updated"})
+    } 
+    catch(err){
+        res.status(500).send(err)
+    }
+})
+
+
+//4. Port setting-up
+app.listen(3005,()=>{
+    console.log("Port 3005 is up and running")
+})
+
+
+install nodemon if required (if installed globally then not required) -> npm install -g nodemon
+
+NOTE: nodemon index.js OR node index.js //If u have issue with running nodemon then check if permission is set or run (Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine)
+
+NOTE: https://www.npmjs.com/package/morgan -> Morgan is used for logging 
+
+Then create a folder with 'model' and in that create DB file .
+
+//1.
+const mongoose = require ("mongoose");
+
+//2.
+mongoose.connect("")
+.then(()=>{
+    console.log("DB connected")
+})
+.catch(err=>console.log(err))
+
+//3. 
+let Schema = mongoose.Schema;
+
+//4. Create new schema and provide the contents
+    const libSchema = new Schema({
+    bookName:String,
+    author:String,
+    language:String,
+    genre:String,
+    bookNum:Number
+});
+var libModel = mongoose.model("book" , libSchema);
+
+//5. eport the model
+model.exports = libModel;
+
+
+
+NOTE: npm i cors  ---> this is to link front end and backend
